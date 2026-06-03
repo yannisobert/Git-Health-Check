@@ -1,3 +1,7 @@
+# Local AI context — never commit
+Claude.MD
+claude.md
+
 # Environment
 .env
 
@@ -10,6 +14,8 @@ vendor/
 # Frontend
 frontend/node_modules/
 frontend/dist/
+server/dist/
+!server/dist/index.html
 
 # IDE / OS
 .idea/
