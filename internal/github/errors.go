@@ -2,7 +2,10 @@ package github
 
 import "fmt"
 
-var ErrRateLimit = fmt.Errorf("github rate limit exceeded")
+var (
+	ErrRateLimit = fmt.Errorf("github: rate limit exceeded")
+	ErrNotFound  = fmt.Errorf("github: not found")
+)
 
 type ErrAPI struct {
 	Status int
