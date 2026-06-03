@@ -1,0 +1,173 @@
+:root {
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  color: #1a1a2e;
+  background: #f8f9fc;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #1a1a2e;
+}
+
+.nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.page h1 {
+  margin-top: 0;
+}
+
+.placeholder {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.repo-form {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1.5rem 0;
+}
+
+.repo-form input {
+  flex: 1;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.repo-form button,
+.link-button {
+  padding: 0.625rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.link-button {
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.examples {
+  margin-top: 1rem;
+}
+
+.score-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+}
+
+.score-value {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.check-list {
+  list-style: none;
+  padding: 0;
+}
+
+.check-item {
+  background: #fff;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.check-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.suggestion {
+  color: #b45309;
+}
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.endpoint-list {
+  list-style: none;
+  padding: 0;
+}
+
+.endpoint-list li {
+  background: #fff;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 6px;
+}
+
+.endpoint-list code {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.settings-form label {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.settings-form input,
+.settings-form select {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 0.25rem;
+  padding: 0.5rem;
+}
+
+.hint {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
