@@ -1,0 +1,19 @@
+# Environment
+.env
+
+# Go
+bin/
+*.exe
+*.test
+vendor/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+*.swp
+*.swo
