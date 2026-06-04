@@ -4,15 +4,20 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/yannisobert/git-health-check/server"
+	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
+	"github.com/yannisobert/git-health-check/server"
 )
 
 func main() {
+	_ = godotenv.Load()
+
 	rootCmd := &cobra.Command{
 		Use:   "ghhealth",
 		Short: "Audit the health of public GitHub repositories",
 	}
+
+	rootCmd.AddCommand(newCheckCmd())
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "server",
