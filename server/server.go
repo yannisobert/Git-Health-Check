@@ -25,8 +25,13 @@ func New() *Server {
 }
 
 func (s *Server) Run() error {
+	h := newHandler()
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/health", handleHealth)
+	mux.HandleFunc("/api/analyze", h.analyze)
+	mux.HandleFunc("/api/history", h.history)
+	mux.HandleFunc("/api/compare", h.compare)
+	mux.HandleFunc("/api/rivals", h.rivals)
 	mux.Handle("/", spaHandler())
 
 	addr := fmt.Sprintf(":%s", s.port)
