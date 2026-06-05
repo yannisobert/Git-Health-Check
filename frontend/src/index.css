@@ -171,3 +171,149 @@ a:hover {
   color: #6b7280;
   font-size: 0.875rem;
 }
+
+/* Loading */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 2rem auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-msg {
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+/* ScoreCard */
+.score-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.score-card-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.score-circle {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  font-weight: 700;
+}
+
+.score-number {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.score-slash {
+  font-size: 1rem;
+  color: #6b7280;
+}
+
+.category-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.category-bar-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 60px;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.category-name {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.bar-track {
+  height: 8px;
+  background: #f3f4f6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.category-score {
+  font-size: 0.8rem;
+  color: #6b7280;
+  text-align: right;
+}
+
+/* CheckList status colors */
+.check-item.check-ok { border-left: 3px solid #16a34a; }
+.check-item.check-warn { border-left: 3px solid #d97706; }
+.check-item.check-fail { border-left: 3px solid #dc2626; }
+
+/* EvolutionChart */
+.evolution-chart {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+}
+
+.evolution-chart h3 {
+  margin-top: 0;
+}
+
+/* Rivals */
+.rivals {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+}
+
+.rivals h3 {
+  margin-top: 0;
+}
+
+.rival-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.rival-item {
+  display: flex;
+  flex-direction: column;
+  background: #f8f9fc;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  min-width: 160px;
+}
+
+.rival-reason {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}

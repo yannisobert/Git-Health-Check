@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import type { RivalSuggestion } from '../api/types'
 
 interface RivalSuggestionsProps {
@@ -6,20 +6,23 @@ interface RivalSuggestionsProps {
 }
 
 export function RivalSuggestions({ rivals }: RivalSuggestionsProps) {
-  if (rivals.length === 0) return null
+  const { owner = '', repo = '' } = useParams()
+
+  const filtered = rivals.filter((r) => r.fullName)
+  if (filtered.length === 0) return null
 
   return (
     <section className="rivals">
       <h3>Compare with similar repos</h3>
-      <ul>
-        {rivals.map((rival) => {
-          const [owner, repo] = rival.fullName.split('/')
+      <ul className="rival-list">
+        {filtered.map((rival) => {
+          const [rOwner, rRepo] = rival.fullName.split('/')
           return (
-            <li key={rival.fullName}>
-              <Link to={`/compare/${owner}/${repo}/placeholder/placeholder`}>
+            <li key={rival.fullName} className="rival-item">
+              <Link to={`/compare/${owner}/${repo}/${rOwner}/${rRepo}`}>
                 {rival.fullName}
               </Link>
-              <span> — {rival.reason}</span>
+              <span className="rival-reason">{rival.reason}</span>
             </li>
           )
         })}
