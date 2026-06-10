@@ -1,0 +1,25 @@
+# Local AI context — never commit
+Claude.MD
+claude.md
+
+# Environment
+.env
+
+# Go
+bin/
+*.exe
+*.test
+vendor/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+server/dist/
+!server/dist/index.html
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+*.swp
+*.swo
