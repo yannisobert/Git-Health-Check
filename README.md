@@ -44,9 +44,32 @@ make dev
 ## CLI
 
 ```bash
-go run ./cmd/ghhealth server    # start HTTP server
-go run ./cmd/ghhealth version   # print version
+# Analyze a repo and display a colored report
+ghhealth check owner/repo
+ghhealth check https://github.com/owner/repo
+
+# Flags
+ghhealth check owner/repo --json            # output raw JSON
+ghhealth check owner/repo --no-color        # disable colors
+ghhealth check owner/repo --period monthly  # history period (weekly|monthly)
+
+# Start the HTTP server (serves API + embedded frontend)
+ghhealth server
+
+ghhealth version
 ```
+
+## API
+
+All endpoints return JSON. Add a `GITHUB_TOKEN` in `.env` to raise the rate limit from 60 to 5000 req/h.
+
+| Endpoint | Description |
+|---|---|
+| `GET /api/analyze?repo=owner/repo` | Full health report (score + checks + suggestions) |
+| `GET /api/history?repo=owner/repo&period=weekly` | Score evolution over time |
+| `GET /api/compare?repo1=o/r1&repo2=o/r2` | Side-by-side comparison with diff |
+| `GET /api/rivals?repo=owner/repo` | Suggested similar repos to compare |
+| `GET /api/health` | Server health check |
 
 ## Project structure
 
