@@ -54,10 +54,26 @@ func (c *Client) GetRepo(ctx context.Context, owner, repo string) (Repo, error) 
 	return r, err
 }
 
-func (c *Client) GetCommits(ctx context.Context, owner, repo string, perPage int) ([]Commit, error) {
-	var commits []Commit
-	err := c.get(ctx, fmt.Sprintf("/repos/%s/%s/commits?per_page=%d", owner, repo, perPage), &commits)
-	return commits, err
+func (c *Client) GetCommits(ctx context.Context, owner, repo string, limit int) ([]Commit, error) {
+	var all []Commit
+	page := 1
+	for len(all) < limit {
+		batch := 100
+		if limit-len(all) < batch {
+			batch = limit - len(all)
+		}
+		var commits []Commit
+		url := fmt.Sprintf("/repos/%s/%s/commits?per_page=%d&page=%d", owner, repo, batch, page)
+		if err := c.get(ctx, url, &commits); err != nil {
+			return nil, err
+		}
+		all = append(all, commits...)
+		if len(commits) < batch {
+			break
+		}
+		page++
+	}
+	return all, nil
 }
 
 func (c *Client) GetIssues(ctx context.Context, owner, repo string) ([]Issue, error) {
