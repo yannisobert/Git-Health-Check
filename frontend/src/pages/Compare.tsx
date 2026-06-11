@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { compareRepos, getHistory } from '../api/client'
 import type { CompareResult, HistoryPoint } from '../api/types'
+import { AnalyzingLoader } from '../components/AnalyzingLoader'
 import { CompareView } from '../components/CompareView'
 
 export function Compare() {
@@ -33,30 +34,40 @@ export function Compare() {
       .finally(() => setLoading(false))
   }, [repo1, repo2])
 
-  if (loading) {
-    return (
-      <section className="page compare">
-        <h1>Comparing {repo1} vs {repo2}…</h1>
-        <div className="spinner" />
-      </section>
-    )
-  }
+  if (loading) return <AnalyzingLoader repo={`${repo1} · ${repo2}`} />
+
+  const banner = (
+    <div className="page-banner">
+      <div className="page-banner-inner">
+        <p className="page-banner-eyebrow">Comparison</p>
+        <div className="banner-compare">
+          <span>{repo1}</span>
+          <span className="vs-badge">VS</span>
+          <span>{repo2}</span>
+        </div>
+      </div>
+    </div>
+  )
 
   if (error) {
     return (
-      <section className="page compare">
-        <h1>Compare</h1>
-        <p className="error-msg">{error}</p>
-      </section>
+      <>
+        {banner}
+        <div className="container-overlap">
+          <p className="error-msg">{error}</p>
+        </div>
+      </>
     )
   }
 
   if (!result) return null
 
   return (
-    <section className="page compare">
-      <h1>{repo1} vs {repo2}</h1>
-      <CompareView result={result} history1={history1} history2={history2} />
-    </section>
+    <>
+      {banner}
+      <div className="container-overlap">
+        <CompareView result={result} history1={history1} history2={history2} />
+      </div>
+    </>
   )
 }
