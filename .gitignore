@@ -14,6 +14,7 @@ vendor/
 # Frontend
 frontend/node_modules/
 frontend/dist/
+frontend/.vite/
 server/dist/
 !server/dist/index.html
 
