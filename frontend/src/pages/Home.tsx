@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const EXAMPLES = ['gin-gonic/gin', 'facebook/react', 'django/django', 'expressjs/express']
@@ -33,6 +33,27 @@ const CATEGORIES = [
 export function Home() {
   const [url, setUrl] = useState('')
   const navigate = useNavigate()
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([])
+
+  // Scroll-triggered reveal for feature cards
+  useEffect(() => {
+    const observers: IntersectionObserver[] = []
+    cardsRef.current.forEach((el, i) => {
+      if (!el) return
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => el.classList.add('visible'), i * 80)
+            obs.disconnect()
+          }
+        },
+        { threshold: 0.15 }
+      )
+      obs.observe(el)
+      observers.push(obs)
+    })
+    return () => observers.forEach(o => o.disconnect())
+  }, [])
 
   function parseRepo(input: string): string | null {
     const trimmed = input.trim()
@@ -53,11 +74,13 @@ export function Home() {
   return (
     <div>
       <section className="hero">
-        <h1>Analyze any GitHub repo</h1>
-        <p className="hero-sub">
+        <h1 className="anim-fade-up" style={{ animationDelay: '0ms' }}>
+          Analyze any GitHub repo
+        </h1>
+        <p className="hero-sub anim-fade-up" style={{ animationDelay: '90ms' }}>
           Get a health score out of 100 — maintenance, activity, conventions, CI/CD.
         </p>
-        <form onSubmit={handleSubmit} className="search-form">
+        <form onSubmit={handleSubmit} className="search-form anim-fade-up" style={{ animationDelay: '180ms' }}>
           <input
             type="text"
             placeholder="owner/repo or https://github.com/owner/repo"
@@ -67,7 +90,7 @@ export function Home() {
           />
           <button type="submit" className="search-btn">Analyze →</button>
         </form>
-        <div className="example-chips">
+        <div className="example-chips anim-fade-up" style={{ animationDelay: '270ms' }}>
           <span>Try:</span>
           {EXAMPLES.map((repo) => {
             const [owner, name] = repo.split('/')
@@ -85,7 +108,7 @@ export function Home() {
         </div>
       </section>
 
-      <div className="home-stats">
+      <div className="home-stats anim-fade-up" style={{ animationDelay: '360ms' }}>
         <span>100 point scale</span>
         <span className="home-stats-dot" />
         <span>4 categories</span>
@@ -96,10 +119,14 @@ export function Home() {
       </div>
 
       <div className="home-features">
-        <h2 className="home-features-title">What we check</h2>
+        <h2 className="home-features-title anim-fade-up" style={{ animationDelay: '420ms' }}>What we check</h2>
         <div className="features-grid">
-          {CATEGORIES.map((cat) => (
-            <div key={cat.name} className="feature-card">
+          {CATEGORIES.map((cat, i) => (
+            <div
+              key={cat.name}
+              className="feature-card"
+              ref={el => { cardsRef.current[i] = el }}
+            >
               <div className="feature-icon">{cat.icon}</div>
               <div className="feature-body">
                 <div className="feature-header">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { analyzeRepo, getHistory, getRivals } from '../api/client'
 import type { HistoryPoint, Report as ReportType, RivalSuggestion } from '../api/types'
@@ -7,6 +7,7 @@ import { CheckList } from '../components/CheckList'
 import { EvolutionChart } from '../components/EvolutionChart'
 import { RivalSuggestions } from '../components/RivalSuggestions'
 import { ScoreCard } from '../components/ScoreCard'
+import { StickyScoreBar } from '../components/StickyScoreBar'
 
 type Period = 'weekly' | 'monthly'
 
@@ -33,6 +34,9 @@ export function Report() {
   const [period, setPeriod] = useState<Period>('weekly')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [stickyVisible, setStickyVisible] = useState(false)
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
+  const scoreCardRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     setLoading(true)
@@ -54,6 +58,38 @@ export function Report() {
       .then(setHistory)
       .catch(() => setHistory([]))
   }, [fullName, period])
+
+  // Sticky bar: show when ScoreCard leaves viewport
+  useEffect(() => {
+    if (!scoreCardRef.current) return
+    const obs = new IntersectionObserver(
+      ([entry]) => setStickyVisible(!entry.isIntersecting),
+      { threshold: 0, rootMargin: '-60px 0px 0px 0px' }
+    )
+    obs.observe(scoreCardRef.current)
+    return () => obs.disconnect()
+  }, [report])
+
+  // Staggered scroll reveal for category cards
+  useEffect(() => {
+    if (!report) return
+    const observers: IntersectionObserver[] = []
+    cardRefs.current.forEach((el, i) => {
+      if (!el) return
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => el.classList.add('visible'), i * 70)
+            obs.disconnect()
+          }
+        },
+        { threshold: 0.1 }
+      )
+      obs.observe(el)
+      observers.push(obs)
+    })
+    return () => observers.forEach(o => o.disconnect())
+  }, [report])
 
   if (loading) return <AnalyzingLoader repo={fullName} />
 
@@ -82,21 +118,36 @@ export function Report() {
   return (
     <>
       {banner}
-      <div className="container-overlap">
-        <ScoreCard
+      {report && (
+        <StickyScoreBar
           repo={report.fullName}
           score={report.score}
           maxScore={report.maxScore}
-          categories={report.categories}
+          visible={stickyVisible}
         />
+      )}
+      <div className="container-overlap">
+        <div ref={scoreCardRef}>
+          <ScoreCard
+            repo={report.fullName}
+            score={report.score}
+            maxScore={report.maxScore}
+            categories={report.categories}
+          />
+        </div>
 
         <div className="checks-grid">
-          {report.categories.map((cat) => {
+          {report.categories.map((cat, i) => {
             const pct = cat.maxScore > 0 ? Math.round((cat.score / cat.maxScore) * 100) : 0
             const color = scoreColor(pct)
             const icon = CATEGORY_ICONS[cat.name] ?? '📋'
             return (
-              <div key={cat.name} className="cat-card" style={{ borderTop: `2px solid ${color}` }}>
+              <div
+                key={cat.name}
+                className="cat-card"
+                ref={el => { cardRefs.current[i] = el }}
+                style={{ borderTop: `2px solid ${color}` }}
+              >
                 <div className="cat-card-header">
                   <span className="cat-card-title">
                     <span className="cat-card-icon">{icon}</span>
