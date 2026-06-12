@@ -33,6 +33,7 @@ export function Report() {
   const [rivals, setRivals] = useState<RivalSuggestion[]>([])
   const [period, setPeriod] = useState<Period>('weekly')
   const [loading, setLoading] = useState(true)
+  const [historyLoading, setHistoryLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [stickyVisible, setStickyVisible] = useState(false)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -54,9 +55,11 @@ export function Report() {
   }, [fullName])
 
   useEffect(() => {
+    setHistoryLoading(true)
     getHistory(fullName, period)
       .then(setHistory)
       .catch(() => setHistory([]))
+      .finally(() => setHistoryLoading(false))
   }, [fullName, period])
 
   // Sticky bar: show when ScoreCard leaves viewport
@@ -163,7 +166,7 @@ export function Report() {
           })}
         </div>
 
-        <EvolutionChart points={history} period={period} onPeriodChange={setPeriod} />
+        <EvolutionChart points={history} period={period} onPeriodChange={setPeriod} loading={historyLoading} />
         <RivalSuggestions rivals={rivals} />
       </div>
     </>

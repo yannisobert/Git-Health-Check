@@ -22,8 +22,11 @@ func (a *Analyzer) History(ctx context.Context, owner, repo string, period Perio
 		return nil, err
 	}
 
-	// Fetch more commits for richer history
-	commits, err := a.client.GetCommits(ctx, owner, repo, 100)
+	limit := 100
+	if period == PeriodMonthly {
+		limit = 500
+	}
+	commits, err := a.client.GetCommits(ctx, owner, repo, limit)
 	if err != nil {
 		return nil, err
 	}
