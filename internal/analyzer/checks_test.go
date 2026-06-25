@@ -184,3 +184,56 @@ func TestCheckDependabot(t *testing.T) {
 		t.Errorf("score = %d, want 4", got.Score)
 	}
 }
+
+func TestCheckCONTRIBUTING(t *testing.T) {
+	tests := []struct {
+		name      string
+		entries   []github.ContentEntry
+		wantScore int
+	}{
+		{"missing", nil, 0},
+		{"short", []github.ContentEntry{entry("CONTRIBUTING.md", 50)}, 2},
+		{"ok", []github.ContentEntry{entry("CONTRIBUTING.md", 500)}, 5},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := checkCONTRIBUTING(&github.RepoData{RootContents: tt.entries})
+			if got.Score != tt.wantScore {
+				t.Errorf("score = %d, want %d", got.Score, tt.wantScore)
+			}
+		})
+	}
+}
+
+func TestCheckPRTemplate(t *testing.T) {
+	got := checkPRTemplate(&github.RepoData{DotGithub: []github.ContentEntry{entry("pull_request_template.md", 0)}})
+	if got.Score != 5 {
+		t.Errorf("score = %d, want 5", got.Score)
+	}
+	got = checkPRTemplate(&github.RepoData{})
+	if got.Score != 0 {
+		t.Errorf("score = %d, want 0", got.Score)
+	}
+}
+
+func TestCheckOtherCI(t *testing.T) {
+	got := checkOtherCI(&github.RepoData{RootContents: []github.ContentEntry{entry(".travis.yml", 0)}})
+	if got.Score != 4 {
+		t.Errorf("score = %d, want 4", got.Score)
+	}
+	got = checkOtherCI(&github.RepoData{})
+	if got.Score != 0 {
+		t.Errorf("score = %d, want 0", got.Score)
+	}
+}
+
+func TestCheckPreCommit(t *testing.T) {
+	got := checkPreCommit(&github.RepoData{RootContents: []github.ContentEntry{entry(".pre-commit-config.yaml", 0)}})
+	if got.Score != 4 {
+		t.Errorf("score = %d, want 4", got.Score)
+	}
+	got = checkPreCommit(&github.RepoData{})
+	if got.Score != 0 {
+		t.Errorf("score = %d, want 0", got.Score)
+	}
+}
