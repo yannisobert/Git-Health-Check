@@ -29,8 +29,8 @@ func TestHandleHealth_StatusAndBody(t *testing.T) {
 	if body["status"] != "ok" {
 		t.Errorf("status = %q, want ok", body["status"])
 	}
-	if body["app"] != "ghhealth" {
-		t.Errorf("app = %q, want ghhealth", body["app"])
+	if body["app"] != "owlspector" {
+		t.Errorf("app = %q, want owlspector", body["app"])
 	}
 }
 

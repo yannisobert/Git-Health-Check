@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 )
@@ -74,6 +75,30 @@ func (c *Client) GetCommits(ctx context.Context, owner, repo string, limit int) 
 		page++
 	}
 	return all, nil
+}
+
+// GetCommitsPage returns one page of commits, newest first.
+func (c *Client) GetCommitsPage(ctx context.Context, owner, repo string, perPage, page int) ([]Commit, error) {
+	var commits []Commit
+	err := c.get(ctx, fmt.Sprintf("/repos/%s/%s/commits?per_page=%d&page=%d", owner, repo, perPage, page), &commits)
+	return commits, err
+}
+
+// GetFirstCommitDate returns the date of the oldest commit touching path,
+// within the most recent 100 commits affecting it. For files that are rarely
+// modified (config files, templates) this is effectively the file's creation
+// date; for heavily-edited files (e.g. README) it may understate how long the
+// file has existed if it has been touched by more than 100 commits.
+func (c *Client) GetFirstCommitDate(ctx context.Context, owner, repo, path string) (time.Time, error) {
+	var commits []Commit
+	err := c.get(ctx, fmt.Sprintf("/repos/%s/%s/commits?path=%s&per_page=100", owner, repo, url.QueryEscape(path)), &commits)
+	if err != nil {
+		return time.Time{}, err
+	}
+	if len(commits) == 0 {
+		return time.Time{}, ErrNotFound
+	}
+	return commits[len(commits)-1].Commit.Author.Date, nil
 }
 
 func (c *Client) GetIssues(ctx context.Context, owner, repo string) ([]Issue, error) {

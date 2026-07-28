@@ -1,4 +1,4 @@
-# ghhealth
+# owlspector
 
 Audit the health of public GitHub repositories. Get a score out of 100 with category breakdowns, improvement suggestions, evolution charts, and repo comparison.
 
@@ -37,7 +37,7 @@ make dev
 | `make dev` | Start Go server + Vite dev server |
 | `make dev-go` | Start Go server only |
 | `make dev-front` | Start Vite dev server only |
-| `make build` | Build frontend and compile binary to `bin/ghhealth` |
+| `make build` | Build frontend and compile binary to `bin/owlspector` |
 | `make test` | Run Go tests |
 | `make tidy` | Tidy Go module dependencies |
 
@@ -45,18 +45,18 @@ make dev
 
 ```bash
 # Analyze a repo and display a colored report
-ghhealth check owner/repo
-ghhealth check https://github.com/owner/repo
+owlspector check owner/repo
+owlspector check https://github.com/owner/repo
 
 # Flags
-ghhealth check owner/repo --json            # output raw JSON
-ghhealth check owner/repo --no-color        # disable colors
-ghhealth check owner/repo --period monthly  # history period (weekly|monthly)
+owlspector check owner/repo --json            # output raw JSON
+owlspector check owner/repo --no-color        # disable colors
+owlspector check owner/repo --period monthly  # history period (weekly|monthly)
 
 # Start the HTTP server (serves API + embedded frontend)
-ghhealth server
+owlspector server
 
-ghhealth version
+owlspector version
 ```
 
 ## API
@@ -74,7 +74,7 @@ All endpoints return JSON. Add a `GITHUB_TOKEN` in `.env` to raise the rate limi
 ## Project structure
 
 ```
-cmd/ghhealth/          CLI entry point
+cmd/owlspector/        CLI entry point
 internal/github/       GitHub REST API client
 internal/analyzer/     Health check logic
 server/                HTTP server + embedded frontend

@@ -46,13 +46,13 @@ func (h *handler) history(w http.ResponseWriter, r *http.Request) {
 		period = analyzer.PeriodWeekly
 	}
 
-	points, err := h.analyzer.History(r.Context(), owner, repo, period)
+	result, err := h.analyzer.History(r.Context(), owner, repo, period)
 	if err != nil {
 		writeAPIError(w, err)
 		return
 	}
 
-	writeJSON(w, http.StatusOK, points)
+	writeJSON(w, http.StatusOK, result)
 }
 
 func (h *handler) compare(w http.ResponseWriter, r *http.Request) {
@@ -89,7 +89,7 @@ func (h *handler) rivals(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleHealth(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, http.StatusOK, map[string]string{"status": "ok", "app": "ghhealth"})
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok", "app": "owlspector"})
 }
 
 // helpers

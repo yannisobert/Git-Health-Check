@@ -42,6 +42,21 @@ type HistoryPoint struct {
 	Event string    `json:"event,omitempty"`
 }
 
+// HistoryResult wraps the reconstructed score points with how much real
+// history backs them, so callers can tell "this repo is just young" apart
+// from "we stopped paging before reaching the requested span".
+type HistoryResult struct {
+	Points []HistoryPoint `json:"points"`
+	// CoveredDays is the actual span, in days, between the oldest fetched
+	// commit and now — it can be less than the period's target span either
+	// because the repo isn't that old, or because Truncated is true.
+	CoveredDays int `json:"coveredDays"`
+	// Truncated is true when commit pagination hit its safety cap
+	// (maxCommitPages) before reaching the requested span or the repo's
+	// actual first commit — the true history may extend further back.
+	Truncated bool `json:"truncated"`
+}
+
 type CompareResult struct {
 	Repo1 Report               `json:"repo1"`
 	Repo2 Report               `json:"repo2"`

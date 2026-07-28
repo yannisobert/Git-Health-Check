@@ -35,7 +35,7 @@ func (s *Server) Run() error {
 	mux.Handle("/", spaHandler())
 
 	addr := fmt.Sprintf(":%s", s.port)
-	log.Printf("ghhealth listening on http://localhost%s", addr)
+	log.Printf("owlspector listening on http://localhost%s", addr)
 	return http.ListenAndServe(addr, corsMiddleware(mux))
 }
 
