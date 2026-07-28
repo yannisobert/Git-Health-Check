@@ -7,6 +7,10 @@ import (
 	"github.com/yannisobert/git-health-check/internal/github"
 )
 
+func release(tag string, daysAgo int) github.Release {
+	return github.Release{TagName: tag, PublishedAt: time.Now().AddDate(0, 0, -daysAgo)}
+}
+
 func TestTruncateToPeriod_Monthly(t *testing.T) {
 	d := time.Date(2024, 3, 15, 12, 30, 0, 0, time.UTC)
 	got := truncateToPeriod(d, PeriodMonthly)
@@ -127,7 +131,7 @@ func TestDetectEvent_NoKeyword(t *testing.T) {
 }
 
 func TestBuildHistory_Empty(t *testing.T) {
-	if buildHistory(nil, PeriodWeekly, 50, 25) != nil {
+	if buildHistory(&github.RepoData{}, PeriodWeekly, fileTimelines{}, 25) != nil {
 		t.Error("expected nil for empty commits")
 	}
 }
@@ -139,8 +143,11 @@ func TestBuildHistory_ScoresInRange(t *testing.T) {
 		commit("chore: c", 15),
 		commit("docs: d", 22),
 	}
-	maxTotal := 75
-	points := buildHistory(commits, PeriodWeekly, 50, 25)
+	// With no files present (fileTimelines{}), the only components that can
+	// score are conventional commits (max 10) and activity (max 25).
+	maxTotal := 35
+	data := &github.RepoData{Commits: commits}
+	points := buildHistory(data, PeriodWeekly, fileTimelines{}, 25)
 	if len(points) == 0 {
 		t.Fatal("expected at least one history point")
 	}
@@ -157,7 +164,8 @@ func TestBuildHistory_Monthly_CappedAt12(t *testing.T) {
 	for i := 0; i < 14; i++ {
 		commits = append(commits, commit("feat: x", i*31))
 	}
-	points := buildHistory(commits, PeriodMonthly, 50, 25)
+	data := &github.RepoData{Commits: commits}
+	points := buildHistory(data, PeriodMonthly, fileTimelines{}, 25)
 	if len(points) > 12 {
 		t.Errorf("got %d points, want at most 12", len(points))
 	}
@@ -169,8 +177,85 @@ func TestBuildHistory_Weekly_CappedAt26(t *testing.T) {
 	for i := 0; i < 30; i++ {
 		commits = append(commits, commit("feat: x", i*7))
 	}
-	points := buildHistory(commits, PeriodWeekly, 50, 25)
+	data := &github.RepoData{Commits: commits}
+	points := buildHistory(data, PeriodWeekly, fileTimelines{}, 25)
 	if len(points) > 26 {
 		t.Errorf("got %d points, want at most 26", len(points))
+	}
+}
+
+func TestConventionalCommitsScoreAt(t *testing.T) {
+	commits := []github.Commit{
+		commit("feat: a", 10),
+		commit("feat: b", 9),
+		commit("fix: c", 8),
+		commit("random change", 3),
+		commit("random change 2", 1),
+	}
+	end := time.Now().AddDate(0, 0, -5)
+
+	// Only the first 3 commits (10, 9, 8 days ago) precede `end`; all 3 are conventional.
+	got := conventionalCommitsScoreAt(commits, end)
+	if got != 10 {
+		t.Errorf("score = %d, want 10 (3/3 conventional before end)", got)
+	}
+
+	// Widening the window to "now" includes the 2 non-conventional commits too: 3/5 = 60%.
+	got = conventionalCommitsScoreAt(commits, time.Now().AddDate(0, 0, 1))
+	if got != 6 {
+		t.Errorf("score = %d, want 6 (3/5 conventional)", got)
+	}
+}
+
+func TestConventionalCommitsScoreAt_NoCommitsBeforeEnd(t *testing.T) {
+	commits := []github.Commit{commit("feat: a", 1)}
+	end := time.Now().AddDate(0, 0, -10)
+	if got := conventionalCommitsScoreAt(commits, end); got != 0 {
+		t.Errorf("score = %d, want 0 when no commits precede end", got)
+	}
+}
+
+func TestSemverReleasesScoreAt(t *testing.T) {
+	releases := []github.Release{release("v1.0.0", 10), release("nightly", 1)}
+
+	if got := semverReleasesScoreAt(releases, time.Now().AddDate(0, 0, -5)); got != 5 {
+		t.Errorf("score = %d, want 5 once the semver release predates end", got)
+	}
+	if got := semverReleasesScoreAt(releases, time.Now().AddDate(0, 0, -20)); got != 0 {
+		t.Errorf("score = %d, want 0 before the semver release exists", got)
+	}
+}
+
+func TestScoreAt_FilePresenceIsTimeGated(t *testing.T) {
+	now := time.Now()
+	timelines := fileTimelines{
+		readme:  now.AddDate(0, 0, -100),
+		license: now.AddDate(0, 0, -10),
+	}
+	data := &github.RepoData{}
+
+	before := scoreAt(data, timelines, now.AddDate(0, 0, -50))
+	if before != 10 {
+		t.Errorf("score = %d, want 10 (README only, LICENSE not yet added)", before)
+	}
+
+	after := scoreAt(data, timelines, now)
+	if after != 20 {
+		t.Errorf("score = %d, want 20 (README + LICENSE both present)", after)
+	}
+}
+
+func TestBuildHistory_ActivityDecaysWithoutNewCommits(t *testing.T) {
+	data := &github.RepoData{
+		Commits: []github.Commit{commit("feat: only commit", 20)},
+	}
+	points := buildHistory(data, PeriodWeekly, fileTimelines{}, 25)
+	if len(points) < 2 {
+		t.Fatalf("expected at least 2 points, got %d", len(points))
+	}
+	last := points[len(points)-1]
+	first := points[0]
+	if last.Score > first.Score {
+		t.Errorf("expected activity score to decay or stay flat as the repo goes stale, got first=%d last=%d", first.Score, last.Score)
 	}
 }

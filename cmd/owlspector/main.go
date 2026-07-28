@@ -13,7 +13,7 @@ func main() {
 	_ = godotenv.Load()
 
 	rootCmd := &cobra.Command{
-		Use:   "ghhealth",
+		Use:   "owlspector",
 		Short: "Audit the health of public GitHub repositories",
 	}
 
@@ -31,7 +31,7 @@ func main() {
 		Use:   "version",
 		Short: "Print version",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("ghhealth dev")
+			fmt.Println("owlspector dev")
 		},
 	})
 

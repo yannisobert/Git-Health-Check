@@ -1,7 +1,7 @@
 .PHONY: dev dev-go dev-front build build-front test lint tidy
 
 dev-go:
-	go run ./cmd/ghhealth server
+	go run ./cmd/owlspector server
 
 dev-front:
 	cd frontend && npm run dev
@@ -15,7 +15,7 @@ build-front:
 	cp -r frontend/dist server/dist
 
 build: build-front
-	go build -o bin/ghhealth ./cmd/ghhealth
+	go build -o bin/owlspector ./cmd/owlspector
 
 test:
 	go test ./cmd/... ./internal/... ./server/...
