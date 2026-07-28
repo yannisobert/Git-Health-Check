@@ -22,8 +22,8 @@ export function Compare() {
 
     Promise.all([
       compareRepos(repo1, repo2),
-      getHistory(repo1).catch((): HistoryPoint[] => []),
-      getHistory(repo2).catch((): HistoryPoint[] => []),
+      getHistory(repo1).then((r) => r.points).catch((): HistoryPoint[] => []),
+      getHistory(repo2).then((r) => r.points).catch((): HistoryPoint[] => []),
     ])
       .then(([compareResult, h1, h2]) => {
         setResult(compareResult)

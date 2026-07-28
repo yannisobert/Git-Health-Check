@@ -1,4 +1,4 @@
-import type { CompareResult, HistoryPoint, Report, RivalSuggestion } from './types'
+import type { CompareResult, HistoryResult, Report, RivalSuggestion } from './types'
 
 const API_BASE = '/api'
 
@@ -15,7 +15,7 @@ export function analyzeRepo(repo: string): Promise<Report> {
   return fetchJSON(`/analyze?repo=${encodeURIComponent(repo)}`)
 }
 
-export function getHistory(repo: string, period = 'weekly'): Promise<HistoryPoint[]> {
+export function getHistory(repo: string, period = 'weekly'): Promise<HistoryResult> {
   return fetchJSON(`/history?repo=${encodeURIComponent(repo)}&period=${period}`)
 }
 
