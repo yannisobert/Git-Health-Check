@@ -9,7 +9,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="navbar-inner">
           <Link to="/" className="logo">
             <img src={logo} alt="" height={36} />
-            <span>ghhealth</span>
+            <span>Owlspector</span>
           </Link>
           <nav className="nav">
             <Link to="/">Home</Link>

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { analyzeRepo, getHistory, getRivals } from '../api/client'
-import type { HistoryPoint, Report as ReportType, RivalSuggestion } from '../api/types'
+import type { HistoryResult, Report as ReportType, RivalSuggestion } from '../api/types'
 import { AnalyzingLoader } from '../components/AnalyzingLoader'
 import { CheckList } from '../components/CheckList'
 import { EvolutionChart } from '../components/EvolutionChart'
@@ -29,7 +29,7 @@ export function Report() {
   const fullName = `${owner}/${repo}`
 
   const [report, setReport] = useState<ReportType | null>(null)
-  const [history, setHistory] = useState<HistoryPoint[]>([])
+  const [history, setHistory] = useState<HistoryResult>({ points: [], coveredDays: 0, truncated: false })
   const [rivals, setRivals] = useState<RivalSuggestion[]>([])
   const [period, setPeriod] = useState<Period>('weekly')
   const [loading, setLoading] = useState(true)
@@ -58,7 +58,7 @@ export function Report() {
     setHistoryLoading(true)
     getHistory(fullName, period)
       .then(setHistory)
-      .catch(() => setHistory([]))
+      .catch(() => setHistory({ points: [], coveredDays: 0, truncated: false }))
       .finally(() => setHistoryLoading(false))
   }, [fullName, period])
 
@@ -166,7 +166,14 @@ export function Report() {
           })}
         </div>
 
-        <EvolutionChart points={history} period={period} onPeriodChange={setPeriod} loading={historyLoading} />
+        <EvolutionChart
+          points={history.points}
+          coveredDays={history.coveredDays}
+          truncated={history.truncated}
+          period={period}
+          onPeriodChange={setPeriod}
+          loading={historyLoading}
+        />
         <RivalSuggestions rivals={rivals} />
       </div>
     </>

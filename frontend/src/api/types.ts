@@ -32,6 +32,12 @@ export interface HistoryPoint {
   event?: string
 }
 
+export interface HistoryResult {
+  points: HistoryPoint[]
+  coveredDays: number
+  truncated: boolean
+}
+
 export interface CompareResult {
   repo1: Report
   repo2: Report

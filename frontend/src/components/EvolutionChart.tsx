@@ -17,15 +17,21 @@ type Period = 'weekly' | 'monthly'
 
 interface EvolutionChartProps {
   points: HistoryPoint[]
+  coveredDays: number
+  truncated: boolean
   period: Period
   onPeriodChange: (p: Period) => void
   loading?: boolean
 }
 
 const PERIODS: { value: Period; label: string }[] = [
-  { value: 'weekly', label: 'Weekly' },
+  { value: 'weekly', label: '6M' },
   { value: 'monthly', label: '1Y' },
 ]
+
+function formatCoverage(days: number) {
+  return days < 30 ? `${days}d` : `${Math.round(days / 30)}mo`
+}
 
 function scoreColor(pct: number) {
   if (pct >= 70) return '#059669'
@@ -42,7 +48,7 @@ function hexToRgb(hex: string) {
 
 const CHART_ANIMATION_MS = 900
 
-export function EvolutionChart({ points, period, onPeriodChange, loading }: EvolutionChartProps) {
+export function EvolutionChart({ points, coveredDays, truncated, period, onPeriodChange, loading }: EvolutionChartProps) {
   const [showSpinner, setShowSpinner] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -124,8 +130,8 @@ export function EvolutionChart({ points, period, onPeriodChange, loading }: Evol
       legend: { display: false },
       tooltip: {
         callbacks: {
-          label: (ctx: { dataIndex: number; parsed: { y: number } }) => {
-            const pct = ctx.parsed.y
+          label: (ctx: { dataIndex: number; parsed: { y: number | null } }) => {
+            const pct = ctx.parsed.y ?? 0
             const prev = scores[ctx.dataIndex - 1]
             const delta = prev != null ? pct - prev : null
             const deltaStr =
@@ -178,6 +184,13 @@ export function EvolutionChart({ points, period, onPeriodChange, loading }: Evol
           ))}
         </div>
       </div>
+
+      {!loading && points.length > 0 && (
+        <p className={`coverage-note${truncated ? ' truncated' : ''}`}>
+          Showing {formatCoverage(coveredDays)} of history
+          {truncated && ' — GitHub fetch limit reached, actual history may be longer'}
+        </p>
+      )}
 
       <div className="chart-wrapper">
         {showSpinner && <div className="chart-loading"><span className="chart-spinner" /></div>}
